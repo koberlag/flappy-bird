@@ -7,8 +7,7 @@ BirdGraphicsComponent.prototype.draw = function(context,position, size) {
     context.translate(position.x, position.y);
     context.scale(size, size);
     context.beginPath();
-    context.fillStyle = "rgb(200,0,0)";
-    context.arc(this.position, 500, 50, 0, 2 * Math.PI);
+    context.arc(0, 0, 1, 0, 2 * Math.PI);
     context.fill();
     context.restore();
 };

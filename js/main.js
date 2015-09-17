@@ -1,26 +1,17 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var BirdGraphicsComponent = function(entity) {
     this.entity = entity;
-    this.position = 0;
 };
 
-BirdGraphicsComponent.prototype.draw = function(context) {	
-    var canvas = document.getElementById('main-canvas')
-    this.position++;
-    if(this.position > canvas.width)
-    {
-        this.position = 0;
-    }
-
+BirdGraphicsComponent.prototype.draw = function(context,position, size) {	
+    context.save();
+    context.translate(position.x, position.y);
+    context.scale(size, size);
     context.beginPath();
     context.fillStyle = "rgb(200,0,0)";
     context.arc(this.position, 500, 50, 0, 2 * Math.PI);
     context.fill();
-    context.fillStyle = "rgb(200,0,0)";
-    context.arc(500 + this.position, 500, 50, 0, 2 * Math.PI);
-    context.fill();
-    context.fillStyle = "rgb(100,0,0)";
-    context.fillRect(10, 10 + this.position, 55, 50);
+    context.restore();
 };
 
 exports.BirdGraphicsComponent = BirdGraphicsComponent;
@@ -107,6 +98,9 @@ GraphicsSystem.prototype.tick = function() {
     // Clear the canvas
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+    this.context.save();
+    this.context.translate(this.canvas.width / 2, this.canvas.height);
+    this.context.scale(this.canvas.height, - this.canvas.height);
     // Rendering goes here
     for (var i=0; i<this.entities.length; i++) {
         var entity = this.entities[i];
@@ -116,6 +110,8 @@ GraphicsSystem.prototype.tick = function() {
 
         entity.components.graphics.draw(this.context);
     }
+    
+    this.context.restore();
 
     // Continue the render loop
     window.requestAnimationFrame(this.tick.bind(this));

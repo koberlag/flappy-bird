@@ -21,8 +21,16 @@ var PipeGraphicsComponent = function(entity) {
     this.entity = entity;
 };
 
-PipeGraphicsComponent.prototype.draw = function() {
-    console.log("Drawing a pipe");
+PipeGraphicsComponent.prototype.draw = function(context) {
+    var position = this.entity.components.physics.position;
+
+  	context.save();
+    context.translate(position.x, position.y);
+    context.beginPath();
+	context.fillRect(0.25, 0.25, 0.25, 0.25);
+	context.fillRect(0.25, -0.5, 0.25, 0.5);
+    context.closePath();
+    context.restore();
 };
 
 exports.PipeGraphicsComponent = PipeGraphicsComponent;
@@ -72,18 +80,26 @@ var Bird = function() {
 exports.Bird = Bird;
 },{"../components/graphics/bird":1,"../components/physics/physics":3}],5:[function(require,module,exports){
 var graphicsComponent = require("../components/graphics/pipe");
+var physicsComponent = require("../components/physics/physics");
 
 var Pipe = function() {
-    console.log("Creating Pipe entity");
+    var physics = new physicsComponent.PhysicsComponent(this);
+    physics.position.y = 0.5;
+    physics.acceleration.y = 0;
+    physics.velocity.x = -0.3;
+
 
     var graphics = new graphicsComponent.PipeGraphicsComponent(this);
     this.components = {
+    	physics: physics,
         graphics: graphics
     };
 };
 
 exports.Pipe = Pipe;
-},{"../components/graphics/pipe":2}],6:[function(require,module,exports){
+
+
+},{"../components/graphics/pipe":2,"../components/physics/physics":3}],6:[function(require,module,exports){
 var graphicsSystem = require('./systems/graphics');
 var physicsSystem = require('./systems/physics');
 var inputSystem = require('./systems/input');
@@ -92,7 +108,7 @@ var bird = require('./entities/bird');
 var pipe = require('./entities/pipe');
 
 var FlappyBird = function() {
-    this.entities = [new bird.Bird()];
+    this.entities = [new bird.Bird(), new pipe.Pipe()];
     this.graphics = new graphicsSystem.GraphicsSystem(this.entities);
 	this.physics = new physicsSystem.PhysicsSystem(this.entities);
 	this.input = new inputSystem.InputSystem(this.entities);

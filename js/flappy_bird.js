@@ -10,11 +10,12 @@ var FlappyBird = function() {
     this.graphics = new graphicsSystem.GraphicsSystem(this.entities);
 	this.physics = new physicsSystem.PhysicsSystem(this.entities);
 	this.input = new inputSystem.InputSystem(this.entities);
+	this.spawnPipe(this);
+};
 
-	var self = this;
-	setInterval(
-	function(){
-		self.entities.push(new pipe.Pipe());
+FlappyBird.prototype.spawnPipe = function(flappyBird){
+	setInterval(function(){
+		flappyBird.entities.push(new pipe.Pipe());
 	}, 2000);
 };
 
@@ -23,10 +24,5 @@ FlappyBird.prototype.run = function() {
     this.physics.run();
     this.input.run();
 };
-
-
-// FlappyBird.prototype.spawnPipe = function(){
-// 	this.entities.push(new pipe.Pipe());
-// };
 
 exports.FlappyBird = FlappyBird;

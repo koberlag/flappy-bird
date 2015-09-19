@@ -22,13 +22,18 @@ var PipeGraphicsComponent = function(entity) {
 };
 
 PipeGraphicsComponent.prototype.draw = function(context) {
-    var position = this.entity.components.physics.position;
+    var position = this.entity.components.physics.position,
+    	upperPipeHeight = this.entity.upperPipeHeight;
+
 
   	context.save();
     context.translate(position.x, position.y);
     context.beginPath();
-	context.fillRect(1, 0.25, 0.25, 0.25);
-	context.fillRect(1, -0.5, 0.25, 0.5);
+	context.fillRect(0, 1 - upperPipeHeight, 0.25, upperPipeHeight);//this.getRandomHeight(0.25,0.75));//this.randomize(0.1, 0.9));
+	context.fillRect(0, 0, 0.25, 0.75 - upperPipeHeight);
+	//context.fillRect(0, 0.25, 0.25, 0.25);
+	//context.fillRect(0, 0, 0.25, 0.5);
+
     context.closePath();
     context.restore();
 };
@@ -84,16 +89,22 @@ var physicsComponent = require("../components/physics/physics");
 
 var Pipe = function() {
     var physics = new physicsComponent.PhysicsComponent(this);
-    physics.position.y = 0.5;
+    physics.position.x = 1;//0.5;
+    physics.position.y = 0;//0.5;
     physics.acceleration.y = 0;
     physics.velocity.x = -0.3;
-
+    this.upperPipeHeight = this.getRandomHeight(25,75);
 
     var graphics = new graphicsComponent.PipeGraphicsComponent(this);
     this.components = {
     	physics: physics,
         graphics: graphics
     };
+};
+
+Pipe.prototype.getRandomHeight = function getRandomInt(min, max) {
+ var randomInt = Math.floor(Math.random() * (max - min)) + min; 
+ return randomInt / 100; 
 };
 
 exports.Pipe = Pipe;
@@ -112,11 +123,12 @@ var FlappyBird = function() {
     this.graphics = new graphicsSystem.GraphicsSystem(this.entities);
 	this.physics = new physicsSystem.PhysicsSystem(this.entities);
 	this.input = new inputSystem.InputSystem(this.entities);
+	this.spawnPipe(this);
+};
 
-	var self = this;
-	setInterval(
-	function(){
-		self.entities.push(new pipe.Pipe());
+FlappyBird.prototype.spawnPipe = function(flappyBird){
+	setInterval(function(){
+		flappyBird.entities.push(new pipe.Pipe());
 	}, 2000);
 };
 
@@ -125,11 +137,6 @@ FlappyBird.prototype.run = function() {
     this.physics.run();
     this.input.run();
 };
-
-
-// FlappyBird.prototype.spawnPipe = function(){
-// 	this.entities.push(new pipe.Pipe());
-// };
 
 exports.FlappyBird = FlappyBird;
 },{"./entities/bird":4,"./entities/pipe":5,"./systems/graphics":8,"./systems/input":9,"./systems/physics":10}],7:[function(require,module,exports){

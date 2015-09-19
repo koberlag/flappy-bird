@@ -27,8 +27,8 @@ PipeGraphicsComponent.prototype.draw = function(context) {
   	context.save();
     context.translate(position.x, position.y);
     context.beginPath();
-	context.fillRect(0.25, 0.25, 0.25, 0.25);
-	context.fillRect(0.25, -0.5, 0.25, 0.5);
+	context.fillRect(1, 0.25, 0.25, 0.25);
+	context.fillRect(1, -0.5, 0.25, 0.5);
     context.closePath();
     context.restore();
 };
@@ -112,6 +112,12 @@ var FlappyBird = function() {
     this.graphics = new graphicsSystem.GraphicsSystem(this.entities);
 	this.physics = new physicsSystem.PhysicsSystem(this.entities);
 	this.input = new inputSystem.InputSystem(this.entities);
+
+	var self = this;
+	setInterval(
+	function(){
+		self.entities.push(new pipe.Pipe());
+	}, 2000);
 };
 
 FlappyBird.prototype.run = function() {
@@ -119,6 +125,11 @@ FlappyBird.prototype.run = function() {
     this.physics.run();
     this.input.run();
 };
+
+
+// FlappyBird.prototype.spawnPipe = function(){
+// 	this.entities.push(new pipe.Pipe());
+// };
 
 exports.FlappyBird = FlappyBird;
 },{"./entities/bird":4,"./entities/pipe":5,"./systems/graphics":8,"./systems/input":9,"./systems/physics":10}],7:[function(require,module,exports){

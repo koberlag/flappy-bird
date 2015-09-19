@@ -8,8 +8,8 @@ PipeGraphicsComponent.prototype.draw = function(context) {
   	context.save();
     context.translate(position.x, position.y);
     context.beginPath();
-	context.fillRect(0.25, 0.25, 0.25, 0.25);
-	context.fillRect(0.25, -0.5, 0.25, 0.5);
+	context.fillRect(1, 0.25, 0.25, 0.25);
+	context.fillRect(1, -0.5, 0.25, 0.5);
     context.closePath();
     context.restore();
 };

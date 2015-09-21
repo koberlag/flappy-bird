@@ -1,25 +1,31 @@
 var graphicsComponent = require("../components/graphics/pipe");
 var physicsComponent = require("../components/physics/physics");
+var collisionComponent = require("../components/collision/rect");
 
-var Pipe = function() {
+var Pipe = function(size, position) {
+    this.size = size;
     var physics = new physicsComponent.PhysicsComponent(this);
-    physics.position.x = 1;//0.5;
-    physics.position.y = 0;//0.5;
-    physics.acceleration.y = 0;
+    //initial position
+    physics.position = position;
     physics.velocity.x = -0.3;
-    this.upperPipeHeight = this.getRandomHeight(25,75);
 
     var graphics = new graphicsComponent.PipeGraphicsComponent(this);
+    var collision = new collisionComponent.RectCollisionComponent(this, size);
+    collision.onCollision = this.onCollision.bind(this);
+
     this.components = {
     	physics: physics,
-        graphics: graphics
+        graphics: graphics,
+        collision: collision
     };
 };
 
-Pipe.prototype.getRandomHeight = function getRandomInt(min, max) {
- var randomInt = Math.floor(Math.random() * (max - min)) + min; 
- return randomInt / 100; 
+
+
+Pipe.prototype.onCollision = function(entity) {
+    console.log("Pipe collided with entity:", entity);
 };
+
 
 exports.Pipe = Pipe;
 

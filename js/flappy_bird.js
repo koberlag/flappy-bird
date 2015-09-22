@@ -7,36 +7,33 @@ var bird = require('./entities/bird');
 
 
 var FlappyBird = function() {
-    this.entities = [new bird.Bird()];
-	this.pipes = new pipeSystem.PipeSystem(this.entities);
+    this.entities = [new bird.Bird(this)];
+	this.pipes = new pipeSystem.PipeSystem(this.entities, this);
     this.graphics = new graphicsSystem.GraphicsSystem(this.entities);
 	this.physics = new physicsSystem.PhysicsSystem(this.entities);
 	this.input = new inputSystem.InputSystem(this.entities);
-	//this.spawnPipes(this);
 };
-
-// FlappyBird.prototype.spawnPipes = function(flappyBird){
-// 	setInterval(function(){
-// 		var bottomPipePosition = {
-// 			x: 1,
-// 			y: 0
-// 		},
-// 		bottomPipe = new pipe.Pipe(bottomPipePosition),
-// 		topPipePosition = {
-// 			x: 1,
-// 			y: 0.75 - bottomPipe.size.height
-// 		};
-// 		topPipe = new pipe.Pipe(topPipePosition);
-
-// 		flappyBird.entities.push(bottomPipe, topPipe);
-// 	}, 2000);
-// };
 
 FlappyBird.prototype.run = function() {
     this.graphics.run();
     this.physics.run();
     this.input.run();
     this.pipes.run();
+};
+
+FlappyBird.prototype.reset = function(){
+	this.entities = [];
+	this.pipes.entities = [];
+	this.graphics.entities = [];
+	this.physics.entities = [];
+	this.input.entities = [];
+	
+	this.entities = [new bird.Bird(this)];
+	this.pipes = new pipeSystem.PipeSystem(this.entities, this);
+    this.graphics = new graphicsSystem.GraphicsSystem(this.entities);
+	this.physics = new physicsSystem.PhysicsSystem(this.entities);
+	this.input = new inputSystem.InputSystem(this.entities);
+	this.run();
 };
 
 exports.FlappyBird = FlappyBird;

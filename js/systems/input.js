@@ -1,3 +1,5 @@
+var settings = require('../settings');
+
 var InputSystem = function(entities) {
     this.entities = entities;
 
@@ -21,7 +23,7 @@ InputSystem.prototype.onTouch = function(evt) {
 
 InputSystem.prototype.flap = function(){
 	var bird = this.entities[0];
-    bird.components.physics.velocity.y = 0.68;
+    bird.components.physics.velocity.y = settings.flappingSpeed;
 }
 
 exports.InputSystem = InputSystem;

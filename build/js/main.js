@@ -250,16 +250,20 @@ var graphicsSystem = require('./systems/graphics');
 var physicsSystem = require('./systems/physics');
 var inputSystem = require('./systems/input');
 var pipeSystem = require('./systems/pipe');
+var uiSystem = require('./systems/ui');
+
 
 var bird = require('./entities/bird');
 
 
 var FlappyBird = function() {
+	this.paused = true;
     this.entities = [new bird.Bird(this)];
 	this.pipes = new pipeSystem.PipeSystem(this.entities, this);
     this.graphics = new graphicsSystem.GraphicsSystem(this.entities);
 	this.physics = new physicsSystem.PhysicsSystem(this.entities);
 	this.input = new inputSystem.InputSystem(this.entities);
+	this.ui = new uiSystem.UISystem(this);
 };
 
 FlappyBird.prototype.run = function() {
@@ -267,6 +271,13 @@ FlappyBird.prototype.run = function() {
     this.physics.run();
     this.input.run();
     this.pipes.run();
+};
+
+FlappyBird.prototype.pause = function() {
+    this.graphics.pause();
+    this.physics.pause();
+    this.input.pause();
+    this.pipes.pause();
 };
 
 FlappyBird.prototype.reset = function(){
@@ -285,12 +296,17 @@ FlappyBird.prototype.reset = function(){
 };
 
 exports.FlappyBird = FlappyBird;
-},{"./entities/bird":6,"./systems/graphics":12,"./systems/input":13,"./systems/physics":14,"./systems/pipe":15}],9:[function(require,module,exports){
+},{"./entities/bird":6,"./systems/graphics":12,"./systems/input":13,"./systems/physics":14,"./systems/pipe":15,"./systems/ui":16}],9:[function(require,module,exports){
 var flappyBird = require('./flappy_bird');
 
 document.addEventListener('DOMContentLoaded', function() {
     var app = new flappyBird.FlappyBird();
-    app.run();
+    if(app.paused){
+    	app.pause();
+    }
+    else{
+    	app.run();
+    }
 });
 },{"./flappy_bird":8}],10:[function(require,module,exports){
 exports.pipeWidth = 0.25;
@@ -340,11 +356,17 @@ var GraphicsSystem = function(entities) {
     this.canvas = document.getElementById('main-canvas');
     // Context is what we draw to
     this.context = this.canvas.getContext('2d');
+    this.paused = true;
 };
 
 GraphicsSystem.prototype.run = function() {
     // Run the render loop
     window.requestAnimationFrame(this.tick.bind(this));
+    this.paused = false;
+};
+
+GraphicsSystem.prototype.pause = function() {
+    this.paused = true;    
 };
 
 GraphicsSystem.prototype.tick = function() {
@@ -371,8 +393,10 @@ GraphicsSystem.prototype.tick = function() {
     }
 
     this.context.restore();
-
-    window.requestAnimationFrame(this.tick.bind(this));
+    
+    if (!this.paused) {
+        window.requestAnimationFrame(this.tick.bind(this));
+    }
 };
 
 exports.GraphicsSystem = GraphicsSystem;
@@ -389,6 +413,11 @@ var InputSystem = function(entities) {
 InputSystem.prototype.run = function() {
     this.canvas.addEventListener('click', this.onClick.bind(this));
     this.canvas.addEventListener('touchstart', this.onTouch.bind(this));
+};
+
+InputSystem.prototype.pause = function(){
+    this.canvas.removeEventListener('click', this.onClick);
+    this.canvas.removeEventListener('touchstart', this.onTouch);
 };
 
 InputSystem.prototype.onClick = function() {
@@ -410,13 +439,20 @@ exports.InputSystem = InputSystem;
 var collisionSystem = require("./collision");
 var PhysicsSystem = function(entities) {
     this.entities = entities;
+    this.interval = null;
     this.collisionSystem = new collisionSystem.CollisionSystem(entities);
 };
 
+
 PhysicsSystem.prototype.run = function() {
     // Run the update loop
-    window.setInterval(this.tick.bind(this), 1000 /60);
+    this.interval = window.setInterval(this.tick.bind(this), 1000 / 60);
 };
+
+PhysicsSystem.prototype.pause = function(){
+    window.clearInterval(this.interval);    
+    this.interval = null;
+}
 
 PhysicsSystem.prototype.tick = function() {
     for (var i=0; i<this.entities.length; i++) {
@@ -437,12 +473,18 @@ var settings = require('../settings');
 
 var PipeSystem = function(entities) {
     this.entities = entities;
+    this.interval = null;
 };
 
 PipeSystem.prototype.run = function() {
     // spawn pipes
-    window.setInterval(this.tick.bind(this), 2000);
+    this.interval = window.setInterval(this.tick.bind(this), 2000);
 };
+
+PipeSystem.prototype.pause = function(){
+	window.clearInterval(this.interval);	
+	this.interval = null;
+}
 
 PipeSystem.prototype.tick = function() {
 	var bottomPipeSize = {
@@ -465,14 +507,6 @@ PipeSystem.prototype.tick = function() {
 	    topPipe    = new pipe.Pipe(topPipeSize, topPipePosition, this);
 	
 	this.entities.push(bottomPipe, topPipe);
-
-	 // for (var i = 0; i < this.entities.length; i++) {
-	 //    var entity = this.entities[i];
-
-	 //    if (entity.collision) {
-	 //      this.entities = [];
-	 //    }
-	 //  }
 };
 
 PipeSystem.prototype.getRandomHeight = function getRandomInt(min, max) {
@@ -482,4 +516,50 @@ PipeSystem.prototype.getRandomHeight = function getRandomInt(min, max) {
 
 exports.PipeSystem = PipeSystem;
 
-},{"../entities/pipe":7,"../settings":10}]},{},[9]);
+},{"../entities/pipe":7,"../settings":10}],16:[function(require,module,exports){
+var UISystem = function(app, entities) {
+	this.app = app;
+	this.pauseListener = this.pause.bind(this);
+	this.runListener = this.run.bind(this);
+    this.overlay = document.getElementById('overlay');
+    this.score = document.getElementById('score');
+
+	document.addEventListener("click", this.runListener, false);
+    document.addEventListener('touchstart', this.runListener);
+};
+
+
+UISystem.prototype.run = function(){
+	if(this.app.paused){
+		this.app.run();
+	}
+	else{
+		this.app.pause();
+	}
+	this.app.paused = !this.app.paused;
+	this.overlay.style.display = 'none';
+	this.score.style.display = 'block';
+
+	document.removeEventListener('click', this.runListener);
+    document.removeEventListener('touchstart', this.runListener);
+    document.addEventListener("keydown", this.pauseListener, false);
+}
+
+UISystem.prototype.pause = function(){
+	if(this.app.paused){
+		this.app.run();
+	}
+	else{
+		this.app.pause();
+	}
+	this.app.paused = !this.app.paused;
+	this.overlay.style.display = 'block';
+	this.score.style.display = 'none';
+	document.removeEventListener('keydown', this.pauseListener);
+	document.addEventListener("click", this.runListener, false);
+    document.addEventListener('touchstart', this.runListener);
+}
+
+exports.UISystem = UISystem;
+
+},{}]},{},[9]);

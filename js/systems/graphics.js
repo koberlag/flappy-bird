@@ -4,11 +4,17 @@ var GraphicsSystem = function(entities) {
     this.canvas = document.getElementById('main-canvas');
     // Context is what we draw to
     this.context = this.canvas.getContext('2d');
+    this.paused = true;
 };
 
 GraphicsSystem.prototype.run = function() {
     // Run the render loop
     window.requestAnimationFrame(this.tick.bind(this));
+    this.paused = false;
+};
+
+GraphicsSystem.prototype.pause = function() {
+    this.paused = true;    
 };
 
 GraphicsSystem.prototype.tick = function() {
@@ -35,8 +41,10 @@ GraphicsSystem.prototype.tick = function() {
     }
 
     this.context.restore();
-
-    window.requestAnimationFrame(this.tick.bind(this));
+    
+    if (!this.paused) {
+        window.requestAnimationFrame(this.tick.bind(this));
+    }
 };
 
 exports.GraphicsSystem = GraphicsSystem;

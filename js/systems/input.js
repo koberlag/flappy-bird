@@ -12,6 +12,11 @@ InputSystem.prototype.run = function() {
     this.canvas.addEventListener('touchstart', this.onTouch.bind(this));
 };
 
+InputSystem.prototype.pause = function(){
+    this.canvas.removeEventListener('click', this.onClick);
+    this.canvas.removeEventListener('touchstart', this.onTouch);
+};
+
 InputSystem.prototype.onClick = function() {
    this.flap();
 };

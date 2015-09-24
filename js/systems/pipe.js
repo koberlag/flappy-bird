@@ -3,12 +3,18 @@ var settings = require('../settings');
 
 var PipeSystem = function(entities) {
     this.entities = entities;
+    this.interval = null;
 };
 
 PipeSystem.prototype.run = function() {
     // spawn pipes
-    window.setInterval(this.tick.bind(this), 2000);
+    this.interval = window.setInterval(this.tick.bind(this), 2000);
 };
+
+PipeSystem.prototype.pause = function(){
+	window.clearInterval(this.interval);	
+	this.interval = null;
+}
 
 PipeSystem.prototype.tick = function() {
 	var bottomPipeSize = {
@@ -31,14 +37,6 @@ PipeSystem.prototype.tick = function() {
 	    topPipe    = new pipe.Pipe(topPipeSize, topPipePosition, this);
 	
 	this.entities.push(bottomPipe, topPipe);
-
-	 // for (var i = 0; i < this.entities.length; i++) {
-	 //    var entity = this.entities[i];
-
-	 //    if (entity.collision) {
-	 //      this.entities = [];
-	 //    }
-	 //  }
 };
 
 PipeSystem.prototype.getRandomHeight = function getRandomInt(min, max) {

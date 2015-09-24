@@ -1,8 +1,67 @@
+html {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+*, *:before, *:after {
+  -webkit-box-sizing: inherit;
+  -moz-box-sizing: inherit;
+  box-sizing: inherit; }
+
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%; }
+  height: 100%;
+  background-color: #87C4FF; }
 
 canvas#main-canvas {
   width: 100%;
   height: 100%; }
+
+div#overlay {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%; }
+  div#overlay section {
+    width: 100%;
+    height: 100%;
+    opacity: 0.65; }
+  div#overlay h1 {
+    text-align: center;
+    font-size: 2.5em; }
+  @media screen and (min-width: 570px) {
+    div#overlay {
+      font-size: 1.5em; }
+      div#overlay ul {
+        width: 570px;
+        margin: 0 auto; } }
+  @media screen and (min-width: 960px) {
+    div#overlay {
+      font-size: 1.5em; }
+      div#overlay section {
+        width: 80%;
+        margin: 0 auto; } }
+
+div#start-menu {
+  width: 100%;
+  background-color: #131829;
+  padding: 1em;
+  color: #D3EAFF;
+  text-align: center;
+  border-radius: 20px; }
+  div#start-menu h2 {
+    font-size: 2em; }
+  div#start-menu ul {
+    text-align: left;
+    font-size: 1.25em; }
+
+div#score {
+  position: fixed;
+  right: 0;
+  left: 0;
+  top: 20%;
+  text-align: center;
+  font-size: 5em;
+  display: block; }
